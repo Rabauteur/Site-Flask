@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABTrading Data</title>
+<style>
+    /* Style de la table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 18px;
+    text-align: left;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden; /* Nécessaire pour arrondir les bords */
+}
+
+/* En-têtes du tableau */
+thead {
+    background-color: #4c7eaf;
+    color: white;
+    font-family: 'Arial', sans-serif;
+    font-size: 16px; /* Réduction de la taille de police */
+}
+
+
+th, td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Suppression du surlignement au survol */
+tr:hover {
+    background-color: unset;
+}
+
+th {
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center; /* Centre le texte horizontalement */
+    vertical-align: middle; /* Centre le texte verticalement */
+}
+
+tbody td {
+    color: #333;
+}
+
+/* Responsiveness pour les petits écrans */
+@media (max-width: 954px) {
+    /* Le tableau devient défilable horizontalement */
+    table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    th, td {
+        padding: 8px 10px;  /* Réduction du padding sur les petits écrans */
+        font-size: 14px;     /* Réduction de la taille de la police */
+    }
+
+
+    /* Éviter que les textes dans les cellules débordent */
+    td {
+        word-wrap: break-word;
+    }
+}
+
+/* Vous pouvez également appliquer un minimum de largeur au tableau */
+table {
+    min-width: 300px; /* Le tableau ne sera jamais plus petit que 300px de large */
+    margin: 0 auto; /* Centre la table horizontalement dans son conteneur */
+    border-collapse: collapse; /* Pour éviter l'espacement entre les bordures des cellules */
+}
+/* Style du bloc des gains */
+.sum-gain {
+    text-align: left;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+.sum-gain p {
+    font-size: 18px;
+    margin: 8px 0;
+    color: #333;
+    display: flex;
+    justify-content: space-between; /* Utilisé pour aligner le texte à gauche et à droite */
+    align-items: center; /* Aligne les éléments au centre verticalement */
+}
+
+.sum-gain p strong {
+    font-weight: bold;
+    color: #4CAF50; /* Vert */
+}
+
+.sum-gain p span {
+    color: #555;
+    text-align: right;
+    flex-grow: 1; /* Permet d'étirer le span vers la droite */
+    padding-left: 10px; /* Ajoute de l'espace entre le label et la valeur */
+}
+.sum-gain p.special strong {
+    font-weight: bold;
+    color: #e26969; /* Une couleur différente */
+    font-size: 18px; /* Taille différente */
+}
+/* Style du bloc date-selector */
+.date-selector {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 800px;  /* Augmenter la largeur du bloc pour mieux espacer */
+    margin: 20px auto;
+    text-align: center;
+}
+
+/* Style des labels */
+.date-selector label {
+    font-size: 16px;
+    color: #333;
+    margin-right: 20px;  /* Plus d'espace entre le label et le champ de saisie */
+    font-weight: bold;
+    display: block;  /* Assure que le label soit sur sa propre ligne */
+    margin-bottom: 5px;  /* Espacement entre le label et l'input */
+}
+
+/* Style des inputs de date */
+.date-selector input[type="date"] {
+    padding: 10px;
+    margin: 10px 15px;  /* Plus d'espace entre les champs de saisie */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 200px; /* Augmentation de la largeur des champs pour les espacer davantage */
+    text-align: center;
+}
+
+/* Style du bouton */
+.date-selector button {
+    background-color: #4CAF50; /* Vert */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 35px;
+    margin-bottom: 15px;
+    transition: background-color 0.3s;
+}
+
+/* Effet au survol du bouton */
+.date-selector button:hover, button2:hover{
+    background-color: #45a049;
+}
+
+.date-selector .quick-select-buttons button {
+    background-color: #f8f9fa; /* Vert */
+    color: #4CAF50;
+    padding: 12px 24px;
+    border: 1px solid #4CAF50; /* Bordure verte */
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    margin: 5px; /* Espacement entre les boutons */
+    margin-top: 10px;
+    margin-bottom: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.date-selector .quick-select-buttons button:hover {
+    background-color: #45a049; /* Couleur plus foncée au survol */
+    color: white;
+}
+
+/* Style pour le formulaire avec une disposition en ligne */
+.date-selector form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;  /* Empêche l'empilement */
+}
+
+/* Style pour l'alignement des inputs et du bouton sur la même ligne */
+.date-selector .form-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* Espacement entre les éléments du formulaire */
+.date-selector form > * {
+    margin-bottom: 10px;
+}
+
+/* Style du titre */
+/* Wrapper pour le titre et le bouton */
+.header-wrapper {
+    display: flex;
+    justify-content: center; /* Centre le contenu horizontalement */
+    align-items: center; /* Centre verticalement */
+    margin-top: 30px;
+    position: relative; /* Permet de placer le bouton à droite sans affecter le titre */
+    width: 100%;
+}
+
+/* Style du titre */
+.page-title {
+    font-family: 'Arial', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: #4CAF50; /* Vert */
+    text-align: center; /* Centre le texte du titre */
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0; /* Évite l'espacement supplémentaire sous le titre */
+}
+
+.nasdaq {
+    display: block; /* Place "Nasdaq" sur une nouvelle ligne */
+    font-size: 18px; /* Taille plus petite */
+    color: #b054c7; /* Bleu */
+    text-transform: none; /* Retire l'effet uppercase si appliqué */
+    font-weight: 400; /* Poids de police plus léger */
+    margin-top: 5px; /* Ajoute un petit espace entre "ABTrading Data" et "Nasdaq" */
+}
+
+/* Conteneur du bouton à droite */
+.header-button {
+    position: absolute; /* Positionne le bouton indépendamment */
+    right: 0; /* Aligne le bouton à droite */
+}
+
+/* Style du bouton */
+.button-container {
+    display: flex;
+    justify-content: flex-end; /* Aligner le bouton à droite */
+}
+
+/* Style du trait sous le titre */
+.divider {
+    width: 100%; /* Le trait prend toute la largeur de la page */
+    border-bottom: 2px solid #4CAF50; /* Le trait de séparation sous le titre */
+    margin-top: 10px; /* Espacement entre le titre et la ligne */
+}
+
+button {
+    background-color: #f8f9fa; /* Vert */
+    color: #b054c7;
+    border: 1px solid #b054c7; /* Bordure verte */
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    margin-right: 5px;
+}
+    /* Changement de couleur du bouton au survol */
+button:hover {
+    background-color: #b054c7; /* Légère variation de couleur au survol */
+    color: white;
+}
+
+@media (min-width: 1200px) {
+    #myChart, #myChart2 {
+        margin-left: 150px; /* Marge à gauche */
+        margin-right: 150px; /* Marge à droite */
+    }
+}
+
+</style>
+</head>
+<body>
+<div class="header-container">
+    <h1 class="page-title">
+        ABTrading Data
+        <span class="nasdaq">Nasdaq</span>
+    </h1>
+    <div class="button-container">
+    <button type="button" onclick="window.location.href='/'">Statistiques</button>
+    <button type="button" onclick="window.location.href='/cours'">En cours</button>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="date-selector">
+    <div class="quick-select-buttons">
+      <button type="button" onclick="fetchDailyData()">Journalier</button>
+      <button type="button" onclick="fetchMonthlyData()">Mensuel</button>
+
+    </div>
+</div>
+
+
+    <canvas id="myChart" width="400" height="200"></canvas>
+    <div class="divider"></div>
+    <canvas id="myChart2" width="400" height="200"></canvas> <!-- Graphique Nombre de Trade -->
+
+
+    <script>
+        let chart1, chart2;  // Déclarer deux graphiques distincts
+
+function fetchDailyData() {
+    fetch('/get_daily_data')
+        .then(response => response.json())
+        .then(data => {
+            renderChart(data.labels, data.sum_data, 'Journalier - Somme des Gains', 'myChart');
+            renderChart(data.labels, data.count_data, 'Journalier - Nombre de Trade', 'myChart2');
+        })
+        .catch(error => console.error('Error fetching daily data:', error));
+}
+
+function fetchMonthlyData() {
+    fetch('/get_monthly_data')
+        .then(response => response.json())
+        .then(data => {
+            renderChart(data.labels, data.sum_data, 'Mensuel - Somme des Gains', 'myChart');
+            renderChart(data.labels, data.count_data, 'Mensuel - Nombre de Trade', 'myChart2');
+        })
+        .catch(error => console.error('Error fetching monthly data:', error));
+}
+
+function renderChart(labels, data, label, chartId) {
+    const ctx = document.getElementById(chartId).getContext('2d');
+
+    // Si un graphique existe déjà, on le détruit pour en créer un nouveau
+    if (chartId === 'myChart') {
+        if (chart1) {
+            chart1.destroy();
+        }
+        chart1 = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Date' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Total' }
+                    }
+                }
+            }
+        });
+    } else if (chartId === 'myChart2') {
+        if (chart2) {
+            chart2.destroy();
+        }
+        chart2 = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    fill: false,
+                    borderColor: 'rgb(92, 39, 227)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Date' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Nombre de Trade' }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Afficher les données journalieres par défaut au chargement
+fetchDailyData();
+
+    </script>
+
+
+</body>
+</html>
